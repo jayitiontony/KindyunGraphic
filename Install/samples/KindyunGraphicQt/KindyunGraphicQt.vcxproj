@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  KindyunGraphicQt.vcxproj - 可选: 用 VS 编译 (需要先安装 Qt5/Qt6 的 msvc 版本)
+
+  注意:
+  - 本工程**默认不进 MemoryGraphic.sln**, 因为环境可能没装 Qt 的 msvc 版本
+  - 编译前请手动修改下方的 QT_DIR 宏, 指向你的 Qt msvc 路径 (如 C:\Qt\Qt5.14.2\5.14.2\msvc2017_64)
+  - 推荐方式仍然是用 Qt Creator 打开 KindyunGraphicQt.pro, 或用 cmake
+-->
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+
+  <PropertyGroup Label="Globals">
+    <RootNamespace>KindyunGraphicQt</RootNamespace>
+    <Keyword>Qt5Vstools</Keyword>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+
+  <!-- ★修改这里: 你的 Qt 路径 (必须含 msvc 版, 不是 mingw) -->
+  <PropertyGroup>
+    <QtDir Condition="'$(QtDir)'==''">C:\Qt\Qt5.14.2\5.14.2\msvc2017_64</QtDir>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <OutDir>$(SolutionDir)Install\bin\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)\msbuild\$(Configuration)-$(Platform)-$(PlatformToolset)\</IntDir>
+  </PropertyGroup>
+
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>QT_CORE_LIB;QT_GUI_LIB;QT_WIDGETS_LIB;UNICODE;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(QtDir)\include;$(QtDir)\include\QtCore;$(QtDir)\include\QtGui;$(QtDir)\include\QtWidgets;$(SolutionDir)Install\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(QtDir)\lib;$(SolutionDir)Install\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;KindyunGraphic.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>QT_CORE_LIB;QT_GUI_LIB;QT_WIDGETS_LIB;UNICODE;_UNICODE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(QtDir)\include;$(QtDir)\include\QtCore;$(QtDir)\include\QtGui;$(QtDir)\include\QtWidgets;$(SolutionDir)Install\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(QtDir)\lib;$(SolutionDir)Install\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;KindyunGraphic.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="MainWindow.cpp" />
+    <ClCompile Include="moc_MainWindow.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MainWindow.h" />
+  </ItemGroup>
+
+  <!-- MOC (Qt 元对象编译器): 处理 Q_OBJECT 宏 -->
+  <Target Name="Moc" BeforeTargets="ClCompile">
+    <Exec Command="&quot;$(QtDir)\bin\moc.exe&quot; MainWindow.h -o moc_MainWindow.cpp" />
+  </Target>
+
+  <!-- Post-build: 拷贝 KindyunGraphic.dll 到输出目录 -->
+  <Target Name="DeployDll" AfterTargets="Link">
+    <Copy SourceFiles="$(SolutionDir)Install\bin\$(Configuration)\KindyunGraphic.dll"
+          DestinationFolder="$(OutDir)"
+          SkipUnchangedFiles="true" />
+    <Message Text="[KindyunGraphicQt] deployed to $(OutDir)" Importance="High" />
+  </Target>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

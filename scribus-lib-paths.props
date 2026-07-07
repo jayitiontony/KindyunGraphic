@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets">
+  </ImportGroup>
+  <!-- Macros for scribus dependencies -->
+  <PropertyGroup Label="UserMacros">
+	<!-- Boost -->
+	<BOOST_DIR>$(MSBuildThisFileDirectory)boost-1.75.0</BOOST_DIR>
+	<BOOST_INCLUDE_DIR>$(BOOST_DIR)</BOOST_INCLUDE_DIR>
+	<!-- Cairo -->
+	<CAIRO_DIR>$(MSBuildThisFileDirectory)cairo-1.18.4</CAIRO_DIR>
+	<CAIRO_INCLUDE_DIR>$(CAIRO_DIR)\include</CAIRO_INCLUDE_DIR>
+	<CAIRO_LIB_DIR>$(CAIRO_DIR)\lib\$(Platform)-$(PlatformToolset)</CAIRO_LIB_DIR>
+	<CAIRO_LIB Condition="'$(Configuration)' == 'Debug'">cairo2d.lib</CAIRO_LIB>
+	<CAIRO_LIB Condition="'$(Configuration)' == 'Release'">cairo2.lib</CAIRO_LIB>
+	<!-- Freetype -->
+	<FREETYPE_DIR>$(MSBuildThisFileDirectory)freetype-2.14.3</FREETYPE_DIR>
+	<FREETYPE_INCLUDE_DIR>$(FREETYPE_DIR)\include</FREETYPE_INCLUDE_DIR>
+	<FREETYPE_LIB_DIR>$(FREETYPE_DIR)\lib\$(Platform)-$(PlatformToolset)</FREETYPE_LIB_DIR>
+	<FREETYPE_LIB Condition="'$(Configuration)' == 'Debug'">freetype_d.lib</FREETYPE_LIB>
+	<FREETYPE_LIB Condition="'$(Configuration)' == 'Release'">freetype.lib</FREETYPE_LIB>
+	<!-- Harfbuzz -->
+	<HARFBUZZ_DIR>$(MSBuildThisFileDirectory)harfbuzz-11.2.1</HARFBUZZ_DIR>
+	<HARFBUZZ_INCLUDE_DIR>$(HARFBUZZ_DIR)\include</HARFBUZZ_INCLUDE_DIR>
+	<HARFBUZZ_LIB_DIR>$(HARFBUZZ_DIR)\lib\$(Platform)-$(PlatformToolset)</HARFBUZZ_LIB_DIR>
+	<HARFBUZZ_LIB Condition="'$(Configuration)' == 'Debug'">harfbuzz_d.lib</HARFBUZZ_LIB>
+	<HARFBUZZ_LIB Condition="'$(Configuration)' == 'Release'">harfbuzz.lib</HARFBUZZ_LIB>
+	<!-- Hunspell -->
+	<HUNSPELL_DIR>$(MSBuildThisFileDirectory)hunspell-1.7.2</HUNSPELL_DIR>
+	<HUNSPELL_INCLUDE_DIR>$(HUNSPELL_DIR)\include</HUNSPELL_INCLUDE_DIR>
+	<HUNSPELL_LIB_DIR>$(HUNSPELL_DIR)\lib\$(Platform)-$(PlatformToolset)</HUNSPELL_LIB_DIR>
+	<HUNSPELL_LIB Condition="'$(Configuration)' == 'Debug'">libhunspell_staticD.lib</HUNSPELL_LIB>
+	<HUNSPELL_LIB Condition="'$(Configuration)' == 'Release'">libhunspell_static.lib</HUNSPELL_LIB>
+	<!-- Iconv -->
+	<ICONV_DIR>$(MSBuildThisFileDirectory)libiconv-1.17</ICONV_DIR>
+	<ICONV_INCLUDE_DIR>$(ICONV_DIR)\include</ICONV_INCLUDE_DIR>
+	<ICONV_LIB_DIR>$(ICONV_DIR)\lib\$(Platform)-$(PlatformToolset)</ICONV_LIB_DIR>
+    <ICONV_LIB Condition="'$(Configuration)' == 'Debug'">iconv_d.lib</ICONV_LIB>
+    <ICONV_LIB Condition="'$(Configuration)' == 'Release'">iconv.lib</ICONV_LIB>
+	<!-- Icu -->
+	<ICU_DIR>$(MSBuildThisFileDirectory)icu-78.3</ICU_DIR>
+	<ICU_INCLUDE_DIR>$(ICU_DIR)\include</ICU_INCLUDE_DIR>
+	<ICU_LIB_DIR>$(ICU_DIR)\lib\$(Platform)-$(PlatformToolset)</ICU_LIB_DIR>
+	<ICU_LIB>icudt.lib;icuin.lib;icuuc.lib</ICU_LIB>
+	<!-- LittleCMS 2 -->
+	<LCMS2_DIR>$(MSBuildThisFileDirectory)lcms2-2.18</LCMS2_DIR>
+	<LCMS2_INCLUDE_DIR>$(LCMS2_DIR)\include</LCMS2_INCLUDE_DIR>
+	<LCMS2_LIB_DIR>$(LCMS2_DIR)\lib\$(Platform)-$(PlatformToolset)</LCMS2_LIB_DIR>
+	<LCMS2_LIB Condition="'$(Configuration)' == 'Debug'">lcms2_staticd.lib</LCMS2_LIB>
+	<LCMS2_LIB Condition="'$(Configuration)' == 'Release'">lcms2_static.lib</LCMS2_LIB>
+	<!-- Libcdr -->
+	<LIBCDR_DIR>$(MSBuildThisFileDirectory)libcdr-0.1.8</LIBCDR_DIR>
+	<LIBCDR_INCLUDE_DIR>$(LIBCDR_DIR)\inc</LIBCDR_INCLUDE_DIR>
+	<LIBCDR_LIB_DIR>$(LIBCDR_DIR)\lib\$(Platform)-$(PlatformToolset)</LIBCDR_LIB_DIR>
+	<LIBCDR_LIB Condition="'$(Configuration)' == 'Debug'">libcdr_d.lib</LIBCDR_LIB>
+	<LIBCDR_LIB Condition="'$(Configuration)' == 'Release'">libcdr.lib</LIBCDR_LIB>
+	<!-- Libfreehand -->
+	<LIBFREEHAND_DIR>$(MSBuildThisFileDirectory)libfreehand-0.1.2</LIBFREEHAND_DIR>
+	<LIBFREEHAND_INCLUDE_DIR>$(LIBFREEHAND_DIR)\inc</LIBFREEHAND_INCLUDE_DIR>
+	<LIBFREEHAND_LIB_DIR>$(LIBFREEHAND_DIR)\lib\$(Platform)-$(PlatformToolset)</LIBFREEHAND_LIB_DIR>
+	<LIBFREEHAND_LIB Condition="'$(Configuration)' == 'Debug'">libfreehand_d.lib</LIBFREEHAND_LIB>
+	<LIBFREEHAND_LIB Condition="'$(Configuration)' == 'Release'">libfreehand.lib</LIBFREEHAND_LIB>
+	<!-- Libjpeg -->
+	<LIBJPEG_DIR>$(MSBuildThisFileDirectory)libjpeg-9f</LIBJPEG_DIR>
+	<LIBJPEG_INCLUDE_DIR>$(LIBJPEG_DIR)\include</LIBJPEG_INCLUDE_DIR>
+	<LIBJPEG_LIB_DIR>$(LIBJPEG_DIR)\lib\$(Platform)-$(PlatformToolset)</LIBJPEG_LIB_DIR>
+	<LIBJPEG_LIB Condition="'$(Configuration)' == 'Debug'">libjpeg9f_d.lib</LIBJPEG_LIB>
+	<LIBJPEG_LIB Condition="'$(Configuration)' == 'Release'">libjpeg9f.lib</LIBJPEG_LIB>
+	<!-- Liblzma -->
+	<LIBLZMA_DIR>$(MSBuildThisFileDirectory)liblzma-5.8.3</LIBLZMA_DIR>
+    <LIBLZMA_INCLUDE_DIR>$(LIBLZMA_DIR)\include</LIBLZMA_INCLUDE_DIR>
+	<LIBLZMA_LIB_DIR>$(LIBLZMA_DIR)\lib\$(Platform)-$(PlatformToolset)</LIBLZMA_LIB_DIR>
+    <LIBLZMA_LIB Condition="'$(Configuration)' == 'Debug'">liblzma_d.lib</LIBLZMA_LIB>
+    <LIBLZMA_LIB Condition="'$(Configuration)' == 'Release'">liblzma.lib</LIBLZMA_LIB>
+	<!-- Libmspub -->
+	<LIBMSPUB_DIR>$(MSBuildThisFileDirectory)libmspub-0.1.4</LIBMSPUB_DIR>
+	<LIBMSPUB_INCLUDE_DIR>$(LIBMSPUB_DIR)\inc</LIBMSPUB_INCLUDE_DIR>
+	<LIBMSPUB_LIB_DIR>$(LIBMSPUB_DIR)\lib\$(Platform)-$(PlatformToolset)</LIBMSPUB_LIB_DIR>
+	<LIBMSPUB_LIB Condition="'$(Configuration)' == 'Debug'">libmspub_d.lib</LIBMSPUB_LIB>
+	<LIBMSPUB_LIB Condition="'$(Configuration)' == 'Release'">libmspub.lib</LIBMSPUB_LIB>
+	<!-- Libpagemaker -->
+	<LIBPAGEMAKER_DIR>$(MSBuildThisFileDirectory)libpagemaker-0.0.4</LIBPAGEMAKER_DIR>
+	<LIBPAGEMAKER_INCLUDE_DIR>$(LIBPAGEMAKER_DIR)\inc</LIBPAGEMAKER_INCLUDE_DIR>
+	<LIBPAGEMAKER_LIB_DIR>$(LIBPAGEMAKER_DIR)\lib\$(Platform)-$(PlatformToolset)</LIBPAGEMAKER_LIB_DIR>
+	<LIBPAGEMAKER_LIB Condition="'$(Configuration)' == 'Debug'">libpagemaker_d.lib</LIBPAGEMAKER_LIB>
+	<LIBPAGEMAKER_LIB Condition="'$(Configuration)' == 'Release'">libpagemaker.lib</LIBPAGEMAKER_LIB>
+	<!-- Libpng -->
+	<LIBPNG_DIR>$(MSBuildThisFileDirectory)libpng-1.6.57</LIBPNG_DIR>
+    <LIBPNG_INCLUDE_DIR>$(LIBPNG_DIR)\include</LIBPNG_INCLUDE_DIR>
+	<LIBPNG_LIB_DIR>$(LIBPNG_DIR)\lib\$(Platform)-$(PlatformToolset)</LIBPNG_LIB_DIR>
+    <LIBPNG_LIB Condition="'$(Configuration)' == 'Debug'">libpng16_d.lib</LIBPNG_LIB>
+    <LIBPNG_LIB Condition="'$(Configuration)' == 'Release'">libpng16.lib</LIBPNG_LIB>
+	<!-- Libqxp -->
+	<LIBQXP_DIR>$(MSBuildThisFileDirectory)libqxp-0.0.2</LIBQXP_DIR>
+	<LIBQXP_INCLUDE_DIR>$(LIBQXP_DIR)\inc</LIBQXP_INCLUDE_DIR>
+	<LIBQXP_LIB_DIR>$(LIBQXP_DIR)\lib\$(Platform)-$(PlatformToolset)</LIBQXP_LIB_DIR>
+	<LIBQXP_LIB Condition="'$(Configuration)' == 'Debug'">libqxp_d.lib</LIBQXP_LIB>
+	<LIBQXP_LIB Condition="'$(Configuration)' == 'Release'">libqxp.lib</LIBQXP_LIB>
+	<!-- Librevenge -->
+	<LIBREVENGE_DIR>$(MSBuildThisFileDirectory)librevenge-0.0.5</LIBREVENGE_DIR>
+	<LIBREVENGE_INCLUDE_DIR>$(LIBREVENGE_DIR)\inc</LIBREVENGE_INCLUDE_DIR>
+	<LIBREVENGE_LIB_DIR>$(LIBREVENGE_DIR)\lib\$(Platform)-$(PlatformToolset)</LIBREVENGE_LIB_DIR>
+	<LIBREVENGE_LIB Condition="'$(Configuration)' == 'Debug'">librevenge-0.0d.lib</LIBREVENGE_LIB>
+	<LIBREVENGE_LIB Condition="'$(Configuration)' == 'Release'">librevenge-0.0.lib</LIBREVENGE_LIB>
+	<LIBREVENGE_GENERATORS_LIB Condition="'$(Configuration)' == 'Debug'">librevenge-generators-0.0d.lib</LIBREVENGE_GENERATORS_LIB>
+	<LIBREVENGE_GENERATORS_LIB Condition="'$(Configuration)' == 'Release'">librevenge-generators-0.0.lib</LIBREVENGE_GENERATORS_LIB>
+	<LIBREVENGE_STREAM_LIB Condition="'$(Configuration)' == 'Debug'">librevenge-stream-0.0d.lib</LIBREVENGE_STREAM_LIB>
+	<LIBREVENGE_STREAM_LIB Condition="'$(Configuration)' == 'Release'">librevenge-stream-0.0.lib</LIBREVENGE_STREAM_LIB>
+	<!-- Libtiff -->
+	<LIBTIFF_DIR>$(MSBuildThisFileDirectory)libtiff-4.7.1</LIBTIFF_DIR>
+	<LIBTIFF_INCLUDE_DIR>$(LIBTIFF_DIR)\include</LIBTIFF_INCLUDE_DIR>
+	<LIBTIFF_LIB_DIR>$(LIBTIFF_DIR)\lib\$(Platform)-$(PlatformToolset)</LIBTIFF_LIB_DIR>
+	<LIBTIFF_LIB Condition="'$(Configuration)' == 'Debug'">libtiff5_d.lib</LIBTIFF_LIB>
+	<LIBTIFF_LIB Condition="'$(Configuration)' == 'Release'">libtiff5.lib</LIBTIFF_LIB>
+	<!-- Libvisio -->
+	<LIBVISIO_DIR>$(MSBuildThisFileDirectory)libvisio-0.1.10</LIBVISIO_DIR>
+	<LIBVISIO_INCLUDE_DIR>$(LIBVISIO_DIR)\inc</LIBVISIO_INCLUDE_DIR>
+	<LIBVISIO_LIB_DIR>$(LIBVISIO_DIR)\lib\$(Platform)-$(PlatformToolset)</LIBVISIO_LIB_DIR>
+	<LIBVISIO_LIB Condition="'$(Configuration)' == 'Debug'">libvisio_d.lib</LIBVISIO_LIB>
+	<LIBVISIO_LIB Condition="'$(Configuration)' == 'Release'">libvisio.lib</LIBVISIO_LIB>
+	<!-- Libxml2 -->
+	<LIBXML2_DIR>$(MSBuildThisFileDirectory)libxml2-2.15.2</LIBXML2_DIR>
+	<LIBXML2_INCLUDE_DIR>$(LIBXML2_DIR)\include</LIBXML2_INCLUDE_DIR>
+	<LIBXML2_LIB_DIR>$(LIBXML2_DIR)\lib\$(Platform)-$(PlatformToolset)</LIBXML2_LIB_DIR>
+	<LIBXML2_LIB Condition="'$(Configuration)' == 'Debug'">libxml2_d.lib</LIBXML2_LIB>
+	<LIBXML2_LIB Condition="'$(Configuration)' == 'Release'">libxml2.lib</LIBXML2_LIB>
+	<!-- Libzmf -->
+	<LIBZMF_DIR>$(MSBuildThisFileDirectory)libzmf-0.0.2</LIBZMF_DIR>
+	<LIBZMF_INCLUDE_DIR>$(LIBZMF_DIR)\inc</LIBZMF_INCLUDE_DIR>
+	<LIBZMF_LIB_DIR>$(LIBZMF_DIR)\lib\$(Platform)-$(PlatformToolset)</LIBZMF_LIB_DIR>
+	<LIBZMF_LIB Condition="'$(Configuration)' == 'Debug'">libzmf_d.lib</LIBZMF_LIB>
+	<LIBZMF_LIB Condition="'$(Configuration)' == 'Release'">libzmf.lib</LIBZMF_LIB>
+	<!-- OpenSSL -->
+	<OPENSSL_DIR>$(MSBuildThisFileDirectory)openssl-3.5.6</OPENSSL_DIR>
+	<OPENSSL_INCLUDE_DIR>$(OPENSSL_DIR)\include</OPENSSL_INCLUDE_DIR>
+	<OPENSSL_LIB_DIR>$(OPENSSL_DIR)\lib\$(Platform)</OPENSSL_LIB_DIR>
+    <OPENSSL_LIB Condition="'$(Configuration)' == 'Debug'">libcrypto.lib</OPENSSL_LIB>
+    <OPENSSL_LIB Condition="'$(Configuration)' == 'Release'">libcrypto.lib</OPENSSL_LIB>
+	<!-- Pixman -->
+	<PIXMAN_DIR>$(MSBuildThisFileDirectory)pixman-0.46.4</PIXMAN_DIR>
+    <PIXMAN_INCLUDE_DIR>$(PIXMAN_DIR)\include</PIXMAN_INCLUDE_DIR>
+	<PIXMAN_LIB_DIR>$(PIXMAN_DIR)\lib\$(Platform)-$(PlatformToolset)</PIXMAN_LIB_DIR>
+    <PIXMAN_LIB Condition="'$(Configuration)' == 'Debug'">pixman_d.lib</PIXMAN_LIB>
+    <PIXMAN_LIB Condition="'$(Configuration)' == 'Release'">pixman.lib</PIXMAN_LIB>
+	<!-- PoDoFo -->
+	<PODOFO_DIR>$(MSBuildThisFileDirectory)podofo-1.0.3</PODOFO_DIR>
+	<PODOFO_INCLUDE_DIR>$(PODOFO_DIR)\include</PODOFO_INCLUDE_DIR>
+	<PODOFO_LIB_DIR>$(PODOFO_DIR)\lib\$(Platform)-$(PlatformToolset)</PODOFO_LIB_DIR>
+	<PODOFO_LIB Condition="'$(Configuration)' == 'Debug'">podofo_d.lib</PODOFO_LIB>
+	<PODOFO_LIB Condition="'$(Configuration)' == 'Release'">podofo.lib</PODOFO_LIB>
+	<!-- Poppler -->
+	<POPPLER_DIR>$(MSBuildThisFileDirectory)poppler-24.05.0</POPPLER_DIR>
+	<POPPLER_DIR Condition="'$(PlatformToolset)'=='v143'">$(MSBuildThisFileDirectory)poppler-26.04.0</POPPLER_DIR>
+	<POPPLER_DIR Condition="'$(PlatformToolset)'=='v145'">$(MSBuildThisFileDirectory)poppler-26.04.0</POPPLER_DIR>
+	<POPPLER_INCLUDE_DIR>$(POPPLER_DIR)\include</POPPLER_INCLUDE_DIR>
+	<POPPLER_LIB_DIR>$(POPPLER_DIR)\lib\$(Platform)-$(PlatformToolset)</POPPLER_LIB_DIR>
+	<POPPLER_LIB Condition="'$(Configuration)' == 'Debug'">poppler_staticD.lib</POPPLER_LIB>
+	<POPPLER_LIB Condition="'$(Configuration)' == 'Release'">poppler_static.lib</POPPLER_LIB>
+	<!-- Python 3-->
+	<PYTHON3_DIR Condition="'$(Platform)' == 'Win32'">$(MSBuildThisFileDirectory)python-3.13.13\python-win32</PYTHON3_DIR>
+	<PYTHON3_DIR Condition="'$(Platform)' == 'x64'">$(MSBuildThisFileDirectory)python-3.13.13\python-x64</PYTHON3_DIR>
+	<PYTHON3_INCLUDE_DIR>$(PYTHON3_DIR)\include</PYTHON3_INCLUDE_DIR>
+	<PYTHON3_LIB_DIR>$(PYTHON3_DIR)\lib</PYTHON3_LIB_DIR>
+	<PYTHON3_LIB Condition="'$(Configuration)' == 'Debug'">python313_d.lib</PYTHON3_LIB>
+	<PYTHON3_LIB Condition="'$(Configuration)' == 'Release'">python313.lib</PYTHON3_LIB>
+	<!-- Zlib -->
+	<ZLIB_DIR>$(MSBuildThisFileDirectory)zlib-1.3.2</ZLIB_DIR>
+	<ZLIB_INCLUDE_DIR>$(ZLIB_DIR)\include</ZLIB_INCLUDE_DIR>
+	<ZLIB_LIB_DIR>$(ZLIB_DIR)\lib\$(Platform)-$(PlatformToolset)</ZLIB_LIB_DIR>
+	<ZLIB_LIB Condition="'$(Configuration)' == 'Debug'">zlib1d.lib</ZLIB_LIB>
+	<ZLIB_LIB Condition="'$(Configuration)' == 'Release'">zlib1.lib</ZLIB_LIB>
+  </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
+  </PropertyGroup>
+</Project>

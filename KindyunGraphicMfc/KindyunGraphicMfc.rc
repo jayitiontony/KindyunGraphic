@@ -1,0 +1,104 @@
+// KindyunGraphicMfc.rc
+// Microsoft Visual C++ 生成的资源脚本
+//
+
+// 自带的 icon 文件 (16x16, 32 位)
+// 如果 .ico 文件不存在也可以, VS 会用默认图标; 这里保留声明
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// 从 TEXTINCLUDE 2 资源生成。
+//
+#include "winres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 中文(简体, 中国)资源
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE
+BEGIN
+    "#include ""winres.h""\0"
+END
+
+3 TEXTINCLUDE
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// 图标
+//
+
+// ID 值最低的图标放在第一位, 以保证应用程序图标在所有系统上保持一致。
+IDR_MAINFRAME           ICON                    "KindyunGraphicMfc.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// 菜单
+//
+
+IDR_MAINFRAME MENU
+BEGIN
+    POPUP "文件(&F)"
+    BEGIN
+        MENUITEM "退出(&X)",                       ID_APP_EXIT
+    END
+    POPUP "帮助(&H)"
+    BEGIN
+        MENUITEM "关于(&A) ...",                  ID_APP_ABOUT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// 字符串表
+//
+
+STRINGTABLE
+BEGIN
+    IDR_MAINFRAME                   "KindyunGraphicMfc"
+END
+
+STRINGTABLE
+BEGIN
+    ID_APP_ABOUT            "显示应用程序的版本信息\n关于(&A)..."
+    ID_APP_EXIT             "退出应用程序\n退出(&X)..."
+END
+
+#endif    // 中文(简体, 中国) 资源
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// 从 TEXTINCLUDE 3 资源生成。
+//
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED

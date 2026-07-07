@@ -1,0 +1,15 @@
+﻿MSBuild version 17.6.3+07e294721 for .NET Framework
+
+  stdafx.cpp
+  KindyunGraphicMfc.cpp
+D:\Develop\MemoryGraphic\KindyunGraphicMfc\resource.h(13,1): warning C4005: “ID_APP_ABOUT”: 宏重定义 [D:\Develop\MemoryGraphic\KindyunGraphicMfc\KindyunGraphicMfc.vcxproj]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.36.32532\atlmfc\include\afxres.h(277,1): message : 参见“ID_APP_ABOUT”的前一个定义 [D:\Develop\MemoryGraphic\KindyunGraphicMfc\KindyunGraphicMfc.vcxproj]
+D:\Develop\MemoryGraphic\KindyunGraphicMfc\resource.h(14,1): warning C4005: “ID_APP_EXIT”: 宏重定义 [D:\Develop\MemoryGraphic\KindyunGraphicMfc\KindyunGraphicMfc.vcxproj]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.36.32532\atlmfc\include\afxres.h(278,1): message : 参见“ID_APP_EXIT”的前一个定义 [D:\Develop\MemoryGraphic\KindyunGraphicMfc\KindyunGraphicMfc.vcxproj]
+  MainFrm.cpp
+D:\Develop\MemoryGraphic\KindyunGraphicMfc\resource.h(13,1): warning C4005: “ID_APP_ABOUT”: 宏重定义 [D:\Develop\MemoryGraphic\KindyunGraphicMfc\KindyunGraphicMfc.vcxproj]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.36.32532\atlmfc\include\afxres.h(277,1): message : 参见“ID_APP_ABOUT”的前一个定义 [D:\Develop\MemoryGraphic\KindyunGraphicMfc\KindyunGraphicMfc.vcxproj]
+D:\Develop\MemoryGraphic\KindyunGraphicMfc\resource.h(14,1): warning C4005: “ID_APP_EXIT”: 宏重定义 [D:\Develop\MemoryGraphic\KindyunGraphicMfc\KindyunGraphicMfc.vcxproj]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.36.32532\atlmfc\include\afxres.h(278,1): message : 参见“ID_APP_EXIT”的前一个定义 [D:\Develop\MemoryGraphic\KindyunGraphicMfc\KindyunGraphicMfc.vcxproj]
+  正在生成代码...
+  KindyunGraphicMfc.vcxproj -> D:\Develop\MemoryGraphic\KindyunGraphicMfc\x64\Debug\KindyunGraphicMfc.exe
