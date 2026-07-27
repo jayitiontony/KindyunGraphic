@@ -229,6 +229,15 @@ KG_API double KG_CALL KG_GetTextWidth(KGCanvas canvas, const char* text);
 /// @brief 保存为文件。format: 0=PNG, 1=SVG, 2=PDF, 3=PS
 KG_API int KG_CALL KG_SaveToFile(KGCanvas canvas, const char* filepath, int format);
 
+/// @brief [调试] 释放 cairo 进程内所有静态缓存 (toy_font_face 哈希表、
+///        scaled_font_map、unscaled_font_map、win32_device 单例、
+///        pixman global_glyph_cache 等)。在 ExitInstance 里、所有
+///        KGCanvas 都已经 KG_Destroy 之后调用一次, 可让 MSVC crtdbg 的
+///        _CrtDumpMemoryLeaks 输出保持 0 leak。
+/// @note  **必须在所有 cairo 对象销毁后调用, 否则会段错误。**
+///        仅 Debug 构建使用; Release 构建调用是空操作。
+KG_API void KG_CALL KG_DebugResetStaticData(void);
+
 #ifdef __cplusplus
 } // extern "C"
 #endif
@@ -289,5 +298,6 @@ typedef void            (KG_CALL *PFN_KG_SetFontSize)(KGCanvas canvas, double si
 typedef void            (KG_CALL *PFN_KG_DrawText)(KGCanvas canvas, double x, double y, const char* text);
 typedef double          (KG_CALL *PFN_KG_GetTextWidth)(KGCanvas canvas, const char* text);
 typedef int             (KG_CALL *PFN_KG_SaveToFile)(KGCanvas canvas, const char* filepath, int format);
+typedef void            (KG_CALL *PFN_KG_DebugResetStaticData)(void);
 
 #endif // KINDYUN_GRAPHIC_H

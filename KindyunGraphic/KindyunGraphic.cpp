@@ -15,6 +15,12 @@
 // KindyunGraphic.vcxproj 里作为独立源文件添加, 这样 CairoCanvas 类只编译一次。
 #include "../TestCAiro2/CairoCanvas.h"
 
+// pixman_fini(): 释放 pixman 全局 implementation cache (sse2 / sswe3 /
+// noop / fast_path / general, 每个 ~2KB). GCC/Clang 走 __attribute__((destructor))
+// 自动释放; MSVC 不支持该属性, 必须由调用方在 main 末尾显式调用, 否则
+// _CrtDumpMemoryLeaks 会报 5 条 {362..366} size=2064 的 leak.
+#include <pixman.h>
+
 #include <cstring>
 #include <string>
 #include <vector>
@@ -339,4 +345,22 @@ KG_API double KG_CALL KG_GetTextWidth(KGCanvas canvas, const char* text) {
 KG_API int KG_CALL KG_SaveToFile(KGCanvas canvas, const char* filepath, int format) {
     if (!canvas || !filepath) return 0;
     return ToCanvas(canvas)->Save(std::string(filepath), ToSaveFormat(format)) ? 1 : 0;
+}
+
+// =============================================================================
+// 调试: 释放 cairo 进程内所有静态缓存
+// =============================================================================
+KG_API void KG_CALL KG_DebugResetStaticData(void) {
+    // 必须在所有 cairo_t / cairo_surface_t 都销毁后调用,
+    // 否则会触发 cairo 内部 hash-table 销毁时的 "non-empty" 断言。
+    cairo_debug_reset_static_data();
+
+    // 进一步: 释放 pixman 全局 implementation cache.
+    // 5 个 pixman_implementation_t (sse2 / sswe3 / noop / fast_path / general)
+    // 总共约 10KB, 在 MSVC 下没有 __attribute__((destructor)) 自动释放,
+    // 必须显式调用 pixman_fini() 释放. 否则 _CrtDumpMemoryLeaks 报
+    // {362..366} size=2064 共 5 条 leak.
+    // 顺序: cairo 静态 cache 先清, pixman cache 后清 (避免 cairo 内部仍持有
+    //       pixman 实现指针时去 free pixman).
+    pixman_fini();
 }
