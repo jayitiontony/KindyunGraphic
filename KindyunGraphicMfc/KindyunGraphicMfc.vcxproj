@@ -30,14 +30,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>Dynamic</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>Dynamic</UseOfMfc>
@@ -45,14 +45,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>Dynamic</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>Dynamic</UseOfMfc>
@@ -220,27 +220,12 @@
   -->
   <Target Name="DeploySampleToInstall" AfterTargets="Link">
     <ItemGroup>
-      <_SampleFiles Include="
-        $(ProjectDir)KindyunGraphicMfc.h;
-        $(ProjectDir)KindyunGraphicMfc.cpp;
-        $(ProjectDir)MainFrm.h;
-        $(ProjectDir)MainFrm.cpp;
-        $(ProjectDir)stdafx.h;
-        $(ProjectDir)stdafx.cpp;
-        $(ProjectDir)targetver.h;
-        $(ProjectDir)resource.h;
-        $(ProjectDir)KindyunGraphicMfc.rc;
-        $(ProjectDir)KindyunGraphicMfc.ico;
-        $(ProjectDir)KindyunGraphicMfc.vcxproj;
-        $(ProjectDir)KindyunGraphicMfc.vcxproj.filters" />
+      <_SampleFiles Include="&#xD;&#xA;        $(ProjectDir)KindyunGraphicMfc.h;&#xD;&#xA;        $(ProjectDir)KindyunGraphicMfc.cpp;&#xD;&#xA;        $(ProjectDir)MainFrm.h;&#xD;&#xA;        $(ProjectDir)MainFrm.cpp;&#xD;&#xA;        $(ProjectDir)stdafx.h;&#xD;&#xA;        $(ProjectDir)stdafx.cpp;&#xD;&#xA;        $(ProjectDir)targetver.h;&#xD;&#xA;        $(ProjectDir)resource.h;&#xD;&#xA;        $(ProjectDir)KindyunGraphicMfc.rc;&#xD;&#xA;        $(ProjectDir)KindyunGraphicMfc.ico;&#xD;&#xA;        $(ProjectDir)KindyunGraphicMfc.vcxproj;&#xD;&#xA;        $(ProjectDir)KindyunGraphicMfc.vcxproj.filters" />
     </ItemGroup>
     <MakeDir Directories="$(SolutionDir)Install\samples\KindyunGraphicMfc" />
-    <Copy SourceFiles="@(_SampleFiles)"
-          DestinationFolder="$(SolutionDir)Install\samples\KindyunGraphicMfc\"
-          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(_SampleFiles)" DestinationFolder="$(SolutionDir)Install\samples\KindyunGraphicMfc\" SkipUnchangedFiles="true" />
     <Message Text="[KindyunGraphicMfc] sample deployed to $(SolutionDir)Install\samples\KindyunGraphicMfc\" Importance="High" />
   </Target>
-
   <!--
     ============================================================
     同时把 KindyunGraphicQt 示例源码也复制到 Install\samples\KindyunGraphicQt
@@ -252,19 +237,10 @@
   </PropertyGroup>
   <Target Name="DeployQtSampleToInstall" AfterTargets="Link">
     <ItemGroup>
-      <_QtSampleFiles Include="
-        $(_QtSrcDir)main.cpp;
-        $(_QtSrcDir)MainWindow.h;
-        $(_QtSrcDir)MainWindow.cpp;
-        $(_QtSrcDir)CMakeLists.txt;
-        $(_QtSrcDir)KindyunGraphicQt.pro;
-        $(_QtSrcDir)KindyunGraphicQt.vcxproj;
-        $(_QtSrcDir)README.md" />
+      <_QtSampleFiles Include="&#xD;&#xA;        $(_QtSrcDir)main.cpp;&#xD;&#xA;        $(_QtSrcDir)MainWindow.h;&#xD;&#xA;        $(_QtSrcDir)MainWindow.cpp;&#xD;&#xA;        $(_QtSrcDir)CMakeLists.txt;&#xD;&#xA;        $(_QtSrcDir)KindyunGraphicQt.pro;&#xD;&#xA;        $(_QtSrcDir)KindyunGraphicQt.vcxproj;&#xD;&#xA;        $(_QtSrcDir)README.md" />
     </ItemGroup>
     <MakeDir Directories="$(_InstallDir)samples\KindyunGraphicQt" />
-    <Copy SourceFiles="@(_QtSampleFiles)"
-          DestinationFolder="$(_InstallDir)samples\KindyunGraphicQt\"
-          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(_QtSampleFiles)" DestinationFolder="$(_InstallDir)samples\KindyunGraphicQt\" SkipUnchangedFiles="true" />
     <Message Text="[KindyunGraphicQt] sample deployed to $(_InstallDir)samples\KindyunGraphicQt\" Importance="High" />
   </Target>
   <ImportGroup Label="ExtensionTargets">

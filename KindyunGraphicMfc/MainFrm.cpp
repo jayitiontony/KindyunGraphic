@@ -12,6 +12,54 @@
 #define M_PI 3.14159265358979323846
 #endif
 
+#ifdef _DEBUG
+// ==========================================================================
+// 调试用: 抓"谁在分配 2064 字节"的分配钩子
+// ==========================================================================
+// 用法:
+//   1. 编译 Debug|x64 后 F5 启动 (必须命中断点才能看到调用栈)
+//   2. 程序在 _cairo_malloc(2064) 处 __debugbreak, 看 Call Stack
+//      就能定位是 cairo / mfc140ud / 第三方 dll 哪个分配的
+//   3. 找到了就注释掉这段, 或把目标 allocNumber 写进 g_breakOnAllocRequest
+//      (用 _CrtSetBreakAlloc, 走的是更标准的 hook 流程)
+//
+// 配套环境变量 / 宏:
+//   - 如果只想断"crtdbg dump 报告的某个 alloc 编号", 把 g_breakOnAllocSize
+//     改成 0 并设置 g_breakOnAllocRequest = N (从 dump 的 {NNN} 抄过来)
+//   - 5 个泄漏块的编号是 362, 363, 364, 365, 366 (按 dump 顺序)
+static LONG g_breakOnAllocSize      = 2064;  // 按 size 匹配; 0 = 关闭
+static LONG g_breakOnAllocRequest   = 0;     // 按 _CrtMemBlockHeader.lRequest 匹配; 0 = 关闭
+static LONG g_breakOnAllocHitsLeft  = 1;     // 命中几次后就不再断 (避免一次启动触发 N 次)
+static LONG g_breakOnAllocHitsDone  = 0;     // 已命中次数
+
+static int MyLeakAllocHook(int allocType, void* /*userData*/,
+                            size_t size, int /*blockType*/,
+                            long request,
+                            const unsigned char* /*filename*/,
+                            int /*lineNumber*/)
+{
+    if (allocType != _HOOK_ALLOC)
+        return 1;  // 1 = 让 CRT 继续正常分配
+
+  /*  if (g_breakOnAllocSize && size == (size_t)g_breakOnAllocSize)
+        goto hit;
+    if (g_breakOnAllocRequest && request == g_breakOnAllocRequest)
+        goto hit;*/
+
+    return 1;
+
+//hit:
+//    if (g_breakOnAllocHitsDone < g_breakOnAllocHitsLeft) {
+//        g_breakOnAllocHitsDone++;
+//        // __debugbreak 会在 debug build 里触发 IDE 断点; 不会卡死 CRT
+//        // (在 cairo 内部 alloc 钩子里断相对安全, cairo 这边没有继续持有
+//        //  critical section 的逻辑, 断在分配前相当于让 malloc 还没返回)
+//        __debugbreak();
+//    }
+    return 1;
+}
+#endif // _DEBUG
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -69,6 +117,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct) {
     m_pfnDestroy    = (PFN_KG_Destroy)   ::GetProcAddress(m_hDll, "KG_Destroy");
     m_pfnGetData    = (PFN_KG_GetData)   ::GetProcAddress(m_hDll, "KG_GetData");
     m_pfnGetStride  = (PFN_KG_GetStride) ::GetProcAddress(m_hDll, "KG_GetStride");
+    // [调试] 可选; 老版本 DLL 没这个符号也不报错
+    m_pfnDebugReset = (PFN_KG_DebugResetStaticData)
+                      ::GetProcAddress(m_hDll, "KG_DebugResetStaticData");
     if (!m_pfnCreate || !m_pfnDestroy || !m_pfnGetData || !m_pfnGetStride) {
         ::MessageBox(m_hWnd, _T("KindyunGraphic.dll 缺符号 (KG_Create/KG_Destroy/KG_GetData/KG_GetStride)"),
                      _T("错误"), MB_ICONERROR);
@@ -87,16 +138,39 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct) {
     m_lastFpsTime = std::chrono::steady_clock::now();
     ::SetTimer(m_hWnd, 1, 16, nullptr);
 
+#ifdef _DEBUG
+    // 注册"分配 2064 字节就断"hook, 用于定位剩余的 5 个泄漏
+    // (F5 启动会在 cairo 内部 _cairo_* 分配 2064 字节时断, 看 Call Stack)
+    _CrtSetAllocHook(MyLeakAllocHook);
+#endif
+
     return 0;
 }
 
 void CMainFrame::OnDestroy() {
     ::KillTimer(m_hWnd, 1);
+
+#ifdef _DEBUG
+    // 卸载分配 hook, 避免影响之后的内存 dump
+    _CrtSetAllocHook(nullptr);
+#endif
+
     if (m_canvas && m_pfnDestroy) {
         m_pfnDestroy(m_canvas);
         m_canvas = nullptr;
     }
     if (m_hDll) {
+        // ★ 在 FreeLibrary 之前先调一次 KG_DebugResetStaticData:
+        //   1) 把 cairo 进程内的静态缓存 (toy_font_face / scaled_font_map /
+        //      unscaled_font_map / win32_device / pixman global_glyph_cache 等)
+        //      全部释放, 避免 _CrtDumpMemoryLeaks 报告一堆"漏掉"的 cairo 内部对象
+        //   2) 必须在所有 cairo_t / surface 都销毁之后 (上面 m_pfnDestroy 已调)
+        //   3) FreeLibrary 之后再调就晚了, 因为 cairo 静态状态所在的那块代码
+        //      已经被卸载, 函数指针会指向已释放的内存
+        if (m_pfnDebugReset) {
+            m_pfnDebugReset();
+        }
+
         ::FreeLibrary(m_hDll);
         m_hDll = nullptr;
     }
