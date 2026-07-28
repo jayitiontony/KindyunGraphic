@@ -221,6 +221,15 @@ CairoCanvas::~CairoCanvas() {
         cairo_surface_destroy(m_surfaceRead);
         m_surfaceRead = nullptr;
     }
+    // ★关键★ 零拷贝模式 (m_isLive == true):
+    //   构造函数只设了 m_imageSurface,没设 m_surfaceDraw / m_surfaceRead。
+    //   此时 m_imageSurface 是 image surface 唯一引用,必须单独 destroy,
+    //   否则 image surface + 内部 pixman_image 都会泄漏。
+    //   双缓冲模式:   m_imageSurface == m_surfaceRead,已在上面释放,不再 destroy。
+    //   recording 模式: m_imageSurface == nullptr,不需处理。
+    if (m_isLive && m_imageSurface) {
+        cairo_surface_destroy(m_imageSurface);
+    }
     m_imageSurface = nullptr;
     if (m_recordingSurface) {
         cairo_surface_destroy(m_recordingSurface);

@@ -49,6 +49,7 @@ private:
     PFN_KG_Destroy        m_pfnDestroy = nullptr;
     PFN_KG_GetData        m_pfnGetData = nullptr;
     PFN_KG_GetStride      m_pfnGetStride = nullptr;
+    PFN_KG_DebugResetStaticData m_pfnDebugReset = nullptr;  // [调试] 清理 cairo 静态缓存
     // (其他函数指针按需拿)
 
     // 离屏画布 (固定 800x600, 用客户区尺寸缩放显示)
