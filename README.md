@@ -1,17 +1,18 @@
 # KindyunGraphic 调用说明书
 
-**Version 1.0** | 基于 Cairo 1.18.4 | 纯 C 接口 DLL
-http://www.kindyun.com
+**Version 1.1** | 基于 Cairo 1.18.4 + libiconv 1.19 | 纯 C 接口 DLL
+
 ---
 
 ## 1. 简介
 
 `KindyunGraphic.dll` 是基于 [Cairo 1.18.4](https://www.cairographics.org/) 矢量绘图库封装的纯 C 接口 DLL。
 
-- **零外部依赖**：cairo / libpng / pixman / freetype / zlib 全部静态链入 DLL，运行时只需 `KindyunGraphic.dll` 一个文件（外加 Windows 系统 DLL 与 MSVC 运行时）
+- **零外部依赖**：cairo / libpng / pixman / freetype / zlib / **libiconv 1.19** 全部静态链入 DLL，运行时只需 `KindyunGraphic.dll` 一个文件（外加 Windows 系统 DLL 与 MSVC 运行时）
 - **内置双缓冲**：默认开启，每帧绘制后自动 swap，外部读到的永远是一帧完整画面，**不会闪烁 / 撕裂**
 - **像素格式**：`CAIRO_FORMAT_ARGB32`，Windows x86/x64 上是 **BGRA 字节序**（与 Win32 GDI / Direct2D / WPF 完全一致，零拷贝对接）
 - **C 接口**：`extern "C"` 风格，无 C++ 依赖，**可被 C / C++ / MFC / Qt / .NET / Rust / Go 等任意语言调用**
+- **自动编码识别 (v1.1 新增)**：`KG_DrawText` 输入字符串 **自动识别 UTF-8 / GBK / Latin-1** 三种编码并转 UTF-8 给 cairo，调用方无需关心源码编码
 - **两种使用模式**：
   - **托管模式**：`KG_Create()` → DLL 内部分配两个 buffer，最简单
   - **零拷贝模式**：`KG_CreateFromBuffer()` → 绑定调用方自己的 RGBA buffer，**真正零内存拷贝**
@@ -339,17 +340,16 @@ A: 把 `Install\bin\Release\KindyunGraphic.dll` 复制到 `.exe` 同目录。
 A: 系统找不到指定字体。在 cmd 跑 `dir C:\Windows\Fonts\*.ttf` 看有哪些字体，把 `KG_SetFont` 第一个参数换成确实存在的字体名。
 
 ### Q5: 中文不显示
-A: cairo 1.18 的 toy text API 按 UTF-8 解析字节。代码里**必须**传 UTF-8 字符串，不能是 GBK 编码：
+A: **v1.1 起不再有这个问题**。`KG_DrawText` 内部自动识别字符串编码：
 
-```cpp
-// 正确: UTF-8 源文件, 中文字面量
-KG_DrawText(canvas, x, y, "中文测试");
+| 输入编码 | 自动处理 |
+|---------|---------|
+| UTF-8 | 直接传给 cairo（严格 RFC 3629 校验通过） |
+| GBK / CP936 | 通过内嵌的 libiconv 1.19 静态库自动转 UTF-8 |
+| Latin-1 / CP1252 | 单字节映射转 UTF-8（处理 ° © ® 等字符） |
+| 混合 / 损坏字节 | 跳过非法字节，用 Latin-1 兜底（最坏情况显示原文） |
 
-// 错误: GBK 源文件
-KG_DrawText(canvas, x, y, "中文测试");
-```
-
-MSVC 编译加 `/utf-8` 即可保证源文件是 UTF-8 编码（见本项目示例 vcxproj）。
+决策树见 `KindyunGraphic.cpp` 的 `EnsureUtf8ForCairo()` 函数（带完整中文注释）。**唯一建议**：MSVC 编译仍建议加 `/utf-8`，让源码里 UTF-8 中文字面量直接命中"快速路径"（避免每帧调 libiconv）。
 
 ### Q6: 实时绘制会闪烁
 A: 用托管模式 `KG_Create`（默认开双缓冲），并在每帧绘制后调 `KG_Flush`。外部分别通过 `KG_GetData` 拿数据时就永远是一帧完整画面，**不会撕裂 / 闪烁**。
@@ -395,4 +395,77 @@ KG_Translate            KG_ClosePath          KG_SetFillRule (略)
 
 ---
 
-**© 2026 KindyunGraphic** | Cairo 1.18.4 backend | VS 2022 / v143 toolset
+## 11. 字符编码自适应 (v1.1 新增)
+
+### 11.1 为什么需要
+
+Cairo 1.18 的 `cairo_show_text` toy text API **只接受 UTF-8**。但 Windows 上中文代码页是 GBK (CP936)，常见情况：
+
+| 调用方源代码编码 | cairo 收到 | 渲染结果 |
+|----------------|-----------|---------|
+| UTF-8 (MSVC `/utf-8`) | UTF-8 | ✅ 正常 |
+| GBK (MSVC 默认 936) | GBK 字节 | ❌ "锟斤拷" / tofu |
+| Latin-1 字符串 (例如英文 Windows 上 ° ©) | Latin-1 | ❌ 乱码 |
+
+v1.0 时要求调用方必须传 UTF-8，编译加 `/utf-8`。v1.1 把这个责任搬到 DLL 内：**调用方传啥编码都行**，DLL 自动适配。
+
+### 11.2 算法 (`EnsureUtf8ForCairo`)
+
+```
+input bytes
+  ↓
+[1] 纯 ASCII (所有字节 < 0x80) ──→ 原样返回（最热路径）
+  ↓
+[2] 含高位字节 → 严格 UTF-8 校验 (RFC 3629)
+  ├─ 通过 ──→ 原样返回（按 UTF-8 处理）
+  └─ 失败 ──↓
+[3] 假定 GBK → libiconv "GBK" → "UTF-8//IGNORE"
+  ├─ 成功 ──→ 返回 UTF-8
+  └─ 失败 ──↓
+[4] Latin-1 单字节兜底（0x80-0xFF → U+0080-U+00FF → UTF-8）
+  └─→ 返回 UTF-8（救回 ° © ® 等字符）
+```
+
+每段都带完整中文注释说明：
+- **依据**(RFC 3629 §4 / GBK = GB2312 + 扩展 / libiconv `GBK == CP936` 的 GNU alias)
+- **理由**(为什么不用 `MB_ERR_INVALID_CHARS`、为什么 `//IGNORE` 后缀)
+- **buffer 估算**(GBK → UTF-8 最大 3 倍)
+
+### 11.3 libiconv 1.19 静态集成
+
+| 项 | 路径 |
+|----|------|
+| 源码 | `libiconv-1.19/` |
+| vcxproj | `libiconv-1.19/libiconv.vcxproj`（StaticLibrary, 4 个 Configuration） |
+| 头文件 | `libiconv-1.19/include/iconv.h`（**手写版**, libiconv_ 前缀 API） |
+| 产物 | `libiconv-1.19/lib/x64-v145/libiconv.lib` (Release) / `libiconv_d.lib` (Debug) |
+
+**关键设计**:
+- 所有公开符号加 `libiconv_` 前缀（`libiconv_open` / `libiconv` / `libiconv_close` / `libiconv_t`），避免和 Windows SDK 自带 `<iconv.h>` 冲突
+- `KindyunGraphic.vcxproj` 的 `AdditionalIncludeDirectories` 把 `$(LIBICONV_INCLUDE_DIR)` 放**最前**，确保 `#include <iconv.h>` 解析到我们的 libiconv
+- 配置宏: `scribus-lib-paths.props` 新增 `LIBICONV_DIR / LIBICONV_INCLUDE_DIR / LIBICONV_LIB_DIR / LIBICONV_LIB` 段
+- 依赖关系: `MemoryGraphic.sln` 里 libiconv 是 KindyunGraphic 的 project dependency，自动先 build
+
+**patch 过的 iconv.c 改动**:
+1. 9 行 `#define iconv_* libiconv_*` macros 让函数定义跟头文件声明匹配
+2. `find_canonical_alias()` stub 返回 NULL（替代 gperf 的 `const char* all_canonical[] + pool` 偏移机制）
+3. `iconv_canonicalize()` 简化为 `return name;`（功能等价，因为 libiconv 内部 `aliases_lookup` 大小写不敏感）
+
+### 11.4 三方库白名单例外
+
+本 DLL 静态嵌入的依赖列表：
+
+| 库 | 类别 | 备注 |
+|----|------|------|
+| cairo 1.18.4 | 三方 (GPLv2 / MPLv2) | 矢量绘图 |
+| libpng 1.6.57 | 三方 (PNG License) | PNG 编解码 |
+| pixman 0.46.4 | 三方 (MIT) | 软件光栅化 |
+| freetype 2.14.3 | 三方 (FTL / GPLv2) | TrueType 字体 |
+| zlib 1.3.2 | 三方 (zlib License) | PNG 压缩 |
+| **libiconv 1.19** | 三方 (LGPL 2.1) | **字符编码转换** |
+
+libiconv 静态嵌入是项目既定的"仅 IPP + OpenCL"白名单的**例外**，因为 v1.1 需要编码转换。如果未来项目其它模块也引入第三方依赖，请同步更新白名单文档。
+
+---
+
+**© 2026 KindyunGraphic** | Cairo 1.18.4 + libiconv 1.19 backend | VS 2022 / v143 toolset
